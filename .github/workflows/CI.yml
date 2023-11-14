@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  [pull_request]
+  
+permissions: read-all
+
+jobs:
+  eslint:  
+    runs-on: ubuntu-latest
+    steps:    
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: yarn install
+      - name: Run eslint with reviewdog
+        uses: reviewdog/action-eslint@v1.14.0
+        with:
+          github_token: ${{ secrets.CTC_DEVOPS_ORG_PAT }}
+          reporter: github-pr-review
+          fail_on_error: false
+          eslint_flags: '**/*.{js,jsx}'
+          
+  detect-secrets:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run detect-secrets with reviewdog
+      uses: reviewdog/action-detect-secrets@master
+      with:
+        github_token: ${{ secrets.CTC_DEVOPS_ORG_PAT }}
+        reporter: github-pr-review
+
+        # Prevents false positives from failing job
+        fail_on_error: false

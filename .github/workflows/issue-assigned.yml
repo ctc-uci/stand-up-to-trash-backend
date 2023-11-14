@@ -1,0 +1,24 @@
+name: Issue Assigned
+
+on:
+  issues:
+    types: [assigned]
+jobs:
+  slack_message_assignee:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: borales/actions-yarn@v3.0.0
+        with:
+          cmd: add @slack/bolt mongoose
+      - uses: actions/github-script@v6
+        env:
+          SLACK_TOKEN: ${{ secrets.CTC_SLACKBOT_OAUTH_TOKEN }}
+          SIGNING_SECRET: ${{ secrets.CTC_SLACKBOT_SIGNING_SECRET }}
+          APP_LEVEL_TOKEN: ${{ secrets.CTC_SLACKBOT_APP_LEVEL_TOKEN }}
+          MONGO_URI: ${{ secrets.CTC_SLACKBOT_MONGO_URI }}
+        with:
+          script: |
+            const messageAssignee = require('./.github/workflows/scripts/issueAssigned');
+            await messageAssignee({context});
