@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 
+const data = require('./routes/data');
+
 require('dotenv').config();
 
 const app = express();
@@ -16,3 +18,5 @@ app.use(
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
+
+app.use('/data', data);

@@ -40,11 +40,11 @@ const messageAssignee = async ({ context }) => {
     try {
       const UserModel = getUserModel();
       const slackAssignees = await Promise.allSettled(
-        githubAssignees.map(assignee => UserModel.findOne({ github: assignee.login })),
+        githubAssignees.map((assignee) => UserModel.findOne({ github: assignee.login })),
       );
       if (context.payload.review.state === 'approved') {
         await Promise.all(
-          slackAssignees.map(assignee =>
+          slackAssignees.map((assignee) =>
             Bot.client.chat.postMessage({
               channel: assignee.value?.slackId,
               text: `One of your pull requests has been APPROVED by ${reviewer}! <${url}|View Review> :shrek::thumbsup:`,
@@ -53,7 +53,7 @@ const messageAssignee = async ({ context }) => {
         );
       } else {
         await Promise.all(
-          slackAssignees.map(assignee =>
+          slackAssignees.map((assignee) =>
             Bot.client.chat.postMessage({
               channel: assignee.value?.slackId,
               text: `One of your pull requests has been REVIEWED by ${reviewer}! <${url}|View Review> :shrek:`,
