@@ -23,6 +23,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.0.0",
     "express": "^4.17.1",
+    "nodemailer": "^6.9.7",
     "nodemon": "^2.0.14",
     "pg": "^8.11.3",
     "pg-promise": "^11.5.4",
