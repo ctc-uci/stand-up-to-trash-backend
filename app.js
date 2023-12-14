@@ -4,6 +4,8 @@ const cors = require('cors');
 
 const emailRouter = require('./routes/nodemailer');
 
+const dataRouter = require('./routes/data');
+
 require('dotenv').config();
 
 const app = express();
@@ -17,6 +19,7 @@ app.use(
 );
 
 app.use('/send', emailRouter);
+app.use('/data', dataRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
