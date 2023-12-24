@@ -52,4 +52,25 @@ profilesRouter.put('/:id', async (req, res) => {
   }
 });
 
+// eslint-disable-next-line consistent-return
+profilesRouter.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteProfileResult = await pool.query(
+      'DELETE FROM volunteers WHERE id = $1 RETURNING *',
+      [id],
+    );
+
+    if (deleteProfileResult.rowCount === 0) {
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Profile deleted successfully', profile: deleteProfileResult.rows[0] });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting profile', error: error.message });
+  }
+});
+
 module.exports = profilesRouter;
