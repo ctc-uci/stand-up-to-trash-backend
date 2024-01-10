@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const express = require('express');
 
 const dataRouter = express.Router();
@@ -9,8 +10,7 @@ dataRouter.use(express.json());
 
 dataRouter.get('/', async (req, res) => {
   try {
-    // May or may not work, waiting for DB to work
-    const volunteers = await db.db.query('SELECT * FROM volunteers');
+    const volunteers = await db.query('SELECT * FROM volunteers');
     res.status(200).send(volunteers.rows);
   } catch (err) {
     res.status(500).send(err.message);
@@ -19,17 +19,12 @@ dataRouter.get('/', async (req, res) => {
 
 dataRouter.post('/', async (req, res) => {
   try {
-    // Does not work, waiting for DB to work
-    const { id, email, firstName, lastName } = req.body;
-    const volunteer = {
-      id,
-      email,
-      first_name: firstName,
-      last_name: lastName,
-    };
-    // console.log(volunteers);
-    // const volunteers = await db.db.query('SELECT * FROM volunteers');
-    res.status(200).send(volunteer);
+    const { id, email, first_name, last_name } = req.body;
+    const postQuery =
+      'INSERT INTO volunteers (id, email, first_name, last_name) VALUES ($1, $2, $3, $4);';
+    const volunteer = [id, email, first_name, last_name];
+    const inserted = await db.query(postQuery, volunteer);
+    res.status(200).send(inserted);
   } catch (err) {
     res.status(500).send(err.message);
   }
