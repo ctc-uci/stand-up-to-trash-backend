@@ -6,27 +6,28 @@ const pool = require('../server/db');
 
 eventsRouter.use(express.json());
 
+// GET /events  Returns all event rows in the events table
 eventsRouter.get('/', async (req, res) => {
   try {
     const allEvents = await pool.query('SELECT * FROM events');
-    res.json(allEvents.rows);
+    res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
   }
 });
 
+// GET /events/:id  Returns the corresponding event row based on id
 eventsRouter.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const event = await pool.query('SELECT * FROM events WHERE id =$1', [id]);
-    res.json(event.rows[0]);
+    res.status(200).json(event.rows[0]);
   } catch (error) {
     res.send(error);
   }
 });
 
-// need to fix here (check postman)
-// post adds a new event
+// POST /events  Creates a new event row in the events table
 eventsRouter.post('/', async (req, res) => {
   try {
     const { name, description, location } = req.body;
@@ -34,7 +35,7 @@ eventsRouter.post('/', async (req, res) => {
       'INSERT INTO events (name, description, location) VALUES ($1, $2, $3) RETURNING *',
       [name, description, location],
     );
-    res.json(newEvent.rows[0]);
+    res.status(200).json(newEvent.rows[0]);
   } catch (error) {
     res.json(error);
   }
@@ -49,7 +50,7 @@ eventsRouter.put('/:id', async (req, res) => {
       'UPDATE events SET name = $1, description = $2, location = $3 WHERE id = $4 RETURNING *',
       [name, description, location, id],
     );
-    res.json(updatedEvent.rows[0]);
+    res.status(200).json(updatedEvent.rows[0]);
   } catch (error) {
     res.json(error);
   }
@@ -62,7 +63,7 @@ eventsRouter.delete('/:id', async (req, res) => {
     const deleteEvent = await pool.query('DELETE FROM events WHERE id = $1 RETURNING *', [id]);
 
     if (deleteEvent.rowCount === 0) {
-      return res.status(404).json({ message: 'Event not found' });
+      res.status(404).json({ message: 'Event not found' });
     }
 
     res.status(200).json({ message: 'Event deleted succesfully.', event: deleteEvent.rows[0] });
