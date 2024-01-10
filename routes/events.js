@@ -64,7 +64,7 @@ eventsRouter.delete('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    res.status(200).json({ message: 'Event deleted succesfully.', profile: deleteEvent.rows[0] });
+    res.status(200).json({ message: 'Event deleted succesfully.', event: deleteEvent.rows[0] });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting event', error: error.message });
   }
