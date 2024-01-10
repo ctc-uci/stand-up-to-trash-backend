@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const emailRouter = require('./routes/nodemailer');
+const dataRouter = require('./routes/data');
 const eventsRouter = require('./routes/events');
 const profilesRouter = require('./routes/profiles');
 require('dotenv').config();
+
 const pool = require('./server/db'); // Import the pool object for database connection
 
 const app = express();
@@ -27,6 +29,7 @@ app.get('/test', async (req, res) => {
 });
 
 app.use('/send', emailRouter);
+app.use('/data', dataRouter);
 app.use('/events', eventsRouter);
 app.use('/profiles', profilesRouter);
 
