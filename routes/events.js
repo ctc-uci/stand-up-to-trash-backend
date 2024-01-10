@@ -3,6 +3,7 @@ const express = require('express');
 
 const eventsRouter = express.Router();
 const pool = require('../server/db');
+
 eventsRouter.use(express.json());
 
 eventsRouter.get('/', async (req, res) => {
