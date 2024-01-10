@@ -30,15 +30,7 @@ dataRouter.post('/', async (req, res) => {
       event_id,
       is_checked_in,
     } = req.body;
-    console.log(
-      volunteer_id,
-      number_in_party,
-      pounds,
-      ounces,
-      unusual_items,
-      event_id,
-      is_checked_in,
-    );
+
     const postQuery =
       'INSERT INTO event_data ( volunteer_id, number_in_party, pounds, ounces, unusual_items, event_id, is_checked_in) VALUES ($1, $2, $3, $4, $5, $6, $7);';
     const eventData = [
