@@ -1,25 +1,23 @@
 const express = require('express');
-const { db } = require('../server/db');
+const pool = require('../server/db');
 
 const dataRouter = express.Router();
 
-// dataRouter.get('/', (req, res) => {
-//   console.log(db);
-//   res.send(db);
-// });
+dataRouter.use(express.json());
+
+dataRouter.get('/', async (req, res) => {
+  const volunteer = await pool.query(`SELECT * FROM event_data`);
+  res.status(200).json(volunteer);
+});
 
 dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
   try {
-    const { id } = req.params;
-    const volunteerId = await db.query(
-      `SELECT *
-    FROM events_data D
-    WHERE D.volunteer_id == $(id) `,
-      {
-        id,
-      },
-    );
-    res.status(200).send(volunteerId);
+    const { volunteerId } = req.params;
+    console.log('id', volunteerId);
+    const volunteer = await pool.query(`SELECT * FROM event_data D WHERE D.volunteer_id == $1 `, [
+      volunteerId,
+    ]);
+    res.status(200).json(volunteer);
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
@@ -29,7 +27,7 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
 dataRouter.get('/event/:eventId', async (req, res) => {
   try {
     const { id } = req.params;
-    const eventId = await db.query(
+    const eventId = await pool.query(
       `SELECT *
       FROM event_data D
       WHERE D.event_id == $(id)
@@ -48,7 +46,7 @@ dataRouter.get('/event/:eventId', async (req, res) => {
 dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
   try {
     const { volunteerId, eventId } = req.params;
-    const volAndEventID = await db.query(
+    const volAndEventID = await pool.query(
       `SELECT *
       FROM event_data D
       WHERE D.event_id == $(eventId) AND D.volunteer_id == $(volunteerID)
