@@ -2,7 +2,7 @@
 const express = require('express');
 
 const dataRouter = express.Router();
-const db = require('../server/db');
+const pool = require('../server/db');
 
 require('dotenv').config();
 
@@ -11,10 +11,10 @@ dataRouter.use(express.json());
 dataRouter.get('/', async (req, res) => {
   // Return all data from event_data table
   try {
-    const events = await db.query('SELECT * FROM event_data');
-    res.status(200).send(events.rows);
+    const events = await pool.query('SELECT * FROM event_data');
+    res.status(200).json(events.rows);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).json(err.message);
   }
 });
 
@@ -22,7 +22,6 @@ dataRouter.post('/', async (req, res) => {
   // Add new event to event_data table, requires event info in body
   try {
     const {
-      id,
       volunteer_id,
       number_in_party,
       pounds,
@@ -31,10 +30,18 @@ dataRouter.post('/', async (req, res) => {
       event_id,
       is_checked_in,
     } = req.body;
+    console.log(
+      volunteer_id,
+      number_in_party,
+      pounds,
+      ounces,
+      unusual_items,
+      event_id,
+      is_checked_in,
+    );
     const postQuery =
-      'INSERT INTO event_data (id, volunteer_id, number_in_party, pounds, ounces, unusual_items, event_id, is_checked_in) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);';
+      'INSERT INTO event_data ( volunteer_id, number_in_party, pounds, ounces, unusual_items, event_id, is_checked_in) VALUES ($1, $2, $3, $4, $5, $6, $7);';
     const eventData = [
-      id,
       volunteer_id,
       number_in_party,
       pounds,
@@ -43,8 +50,8 @@ dataRouter.post('/', async (req, res) => {
       event_id,
       is_checked_in,
     ];
-    const insertedStatus = await db.query(postQuery, eventData);
-    res.status(200).send(insertedStatus);
+    const insertedStatus = await pool.query(postQuery, eventData);
+    res.status(200).json(insertedStatus);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -82,7 +89,7 @@ dataRouter.put('/:id', async (req, res) => {
         is_checked_in,
         id,
       ];
-      const inserted = await db.query(putQuery, parameterValues);
+      const inserted = await pool.query(putQuery, parameterValues);
       res.status(200).send(inserted);
     }
   } catch (err) {
@@ -96,7 +103,7 @@ dataRouter.delete('/:id', async (req, res) => {
     const { id } = req.params;
     const delQuery = 'DELETE FROM event_data WHERE id = $1';
     const delId = [id];
-    const deleteStatus = await db.query(delQuery, delId);
+    const deleteStatus = await pool.query(delQuery, delId);
     res.status(200).send(deleteStatus);
   } catch (err) {
     res.status(500).send(err.message);
