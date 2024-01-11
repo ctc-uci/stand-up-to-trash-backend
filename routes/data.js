@@ -1,25 +1,31 @@
 const express = require('express');
-const { db } = require('../server/db');
+const cors = require('cors'); // Import cors middleware
+// const { db } = require('../server/db');
+const pool = require('../server/db'); // Import the pool object for database connection
 
 const dataRouter = express.Router();
-
-// dataRouter.get('/', (req, res) => {
-//   console.log(db);
-//   res.send(db);
+dataRouter.use(cors({ credentials: true }));
+// dataRouter.get('/', async (req, res) => {
+//   const { id } = req.params;
+//   const volunteerId = await pool.query(
+//     `SELECT *
+//     FROM event_data D
+//     WHERE D.volunteer_id = ${id}`
+//   );
+//   console.log(volunteerId);
 // });
 
 dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
   try {
-    const { id } = req.params;
-    const volunteerId = await db.query(
+    const { volunteerId } = req.params;
+    const volunteerData = await pool.query(
       `SELECT *
-    FROM events_data D
-    WHERE D.volunteer_id == $(id) `,
-      {
-        id,
-      },
+      FROM event_data D
+      WHERE D.volunteer_id = $1`,
+      [volunteerId]
     );
-    res.status(200).send(volunteerId);
+    res.status(200).send(volunteerData);
+    console.log(volunteerData);
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
@@ -28,19 +34,16 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
 
 dataRouter.get('/event/:eventId', async (req, res) => {
   try {
-    const { id } = req.params;
-    const eventId = await db.query(
+    const { eventId } = req.params;
+    const eventData = await pool.query(
       `SELECT *
       FROM event_data D
-      WHERE D.event_id == $(id)
-      `,
-      {
-        id,
-      },
+      WHERE D.event_id = $1`,
+      [eventId]
     );
-    res.status(200).send(eventId);
+    res.status(200).send(eventData);
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(500).send(err.message);
   }
 });
@@ -48,17 +51,15 @@ dataRouter.get('/event/:eventId', async (req, res) => {
 dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
   try {
     const { volunteerId, eventId } = req.params;
-    const volAndEventID = await db.query(
+    const volAndEventData = await pool.query(
       `SELECT *
       FROM event_data D
-      WHERE D.event_id == $(eventId) AND D.volunteer_id == $(volunteerID)
+      WHERE D.event_id = $1 AND D.volunteer_id = $2
       `,
-      {
-        volunteerId,
-        eventId,
-      },
+        [eventId, volunteerId],
     );
-    res.status(200).send(volAndEventID);
+    res.status(200).send(volAndEventData);
+    console.log(volAndEventData);
   } catch (err) {
     // console.log(err);
     res.status(500).send(err.message);

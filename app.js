@@ -1,13 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 
-const data = require('./routes/data');
+require('dotenv').config();;
 
+
+const dataRouter = require('./routes/data');
 const emailRouter = require('./routes/nodemailer');
-require('dotenv').config();
+
 const pool = require('./server/db'); // Import the pool object for database connection
 
-const app = express();
+const app = express()
 
 const PORT = process.env.PORT || 3001;
 
@@ -33,4 +35,5 @@ app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
-app.use('/data', data);
+
+app.use('/data', dataRouter);
