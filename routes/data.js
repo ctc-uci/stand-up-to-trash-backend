@@ -20,7 +20,6 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
       [volunteerId]
     );
     res.status(200).send(volunteerData);
-    console.log(volunteerData);
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
@@ -54,7 +53,6 @@ dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
         [eventId, volunteerId],
     );
     res.status(200).send(volAndEventData);
-    console.log(volAndEventData);
   } catch (err) {
     // console.log(err);
     res.status(500).send(err.message);
