@@ -1,19 +1,14 @@
 const express = require('express');
-const cors = require('cors'); // Import cors middleware
-// const { db } = require('../server/db');
-const pool = require('../server/db'); // Import the pool object for database connection
+const pool = require('../server/db');
 
 const dataRouter = express.Router();
-dataRouter.use(cors({ credentials: true }));
-// dataRouter.get('/', async (req, res) => {
-//   const { id } = req.params;
-//   const volunteerId = await pool.query(
-//     `SELECT *
-//     FROM event_data D
-//     WHERE D.volunteer_id = ${id}`
-//   );
-//   console.log(volunteerId);
-// });
+
+dataRouter.use(express.json());
+
+dataRouter.get('/', async (req, res) => {
+  const volunteer = await pool.query(`SELECT * FROM event_data`);
+  res.status(200).json(volunteer);
+});
 
 dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
   try {
