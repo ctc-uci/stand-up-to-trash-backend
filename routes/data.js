@@ -113,7 +113,6 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
     );
     res.status(200).send(volunteerData);
   } catch (err) {
-    console.log(err);
     res.status(500).send(err.message);
   }
 });
@@ -129,7 +128,6 @@ dataRouter.get('/event/:eventId', async (req, res) => {
     );
     res.status(200).send(eventData);
   } catch (err) {
-    console.log(err);
     res.status(500).send(err.message);
   }
 });
