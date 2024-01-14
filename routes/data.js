@@ -102,4 +102,51 @@ dataRouter.delete('/:id', async (req, res) => {
   }
 });
 
+dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
+  try {
+    const { volunteerId } = req.params;
+    const volunteerData = await pool.query(
+      `SELECT *
+      FROM event_data D
+      WHERE D.volunteer_id = $1`,
+      [volunteerId],
+    );
+    res.status(200).json(volunteerData.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/event/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const eventData = await pool.query(
+      `SELECT *
+      FROM event_data D
+      WHERE D.event_id = $1`,
+      [eventId],
+    );
+    res.status(200).json(eventData.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
+  try {
+    const { volunteerId, eventId } = req.params;
+    const volAndEventData = await pool.query(
+      `SELECT *
+      FROM event_data D
+      WHERE D.event_id = $1 AND D.volunteer_id = $2
+      `,
+      [eventId, volunteerId],
+    );
+    res.status(200).json(volAndEventData.rows);
+  } catch (err) {
+    // console.log(err);
+    res.status(500).send(err.message);
+  }
+});
+
 module.exports = dataRouter;

@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const emailRouter = require('./routes/nodemailer');
+
+require('dotenv').config();
+
 const dataRouter = require('./routes/data');
+const emailRouter = require('./routes/nodemailer');
 const eventsRouter = require('./routes/events');
 const profilesRouter = require('./routes/profiles');
 require('dotenv').config();
