@@ -111,7 +111,7 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
       WHERE D.volunteer_id = $1`,
       [volunteerId],
     );
-    res.status(200).send(volunteerData);
+    res.status(200).json(volunteerData.rows);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -126,7 +126,7 @@ dataRouter.get('/event/:eventId', async (req, res) => {
       WHERE D.event_id = $1`,
       [eventId],
     );
-    res.status(200).send(eventData);
+    res.status(200).json(eventData.rows);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -142,7 +142,7 @@ dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
       `,
       [eventId, volunteerId],
     );
-    res.status(200).send(volAndEventData);
+    res.status(200).json(volAndEventData.rows);
   } catch (err) {
     // console.log(err);
     res.status(500).send(err.message);
