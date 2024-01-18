@@ -18,6 +18,18 @@ dataRouter.get('/', async (req, res) => {
   }
 });
 
+dataRouter.get('/:id', async (req, res) => {
+  // Return all data from event_data table
+  try {
+    const { id } = req.params;
+    const events = await pool.query('SELECT * FROM event_data WHERE event_id =$1', [id]);
+
+    res.status(200).json(events.rows);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
 dataRouter.post('/', async (req, res) => {
   // Add new event to event_data table, requires event info in body
   try {
