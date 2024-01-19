@@ -19,7 +19,7 @@ dataRouter.get('/', async (req, res) => {
 });
 
 dataRouter.get('/:id', async (req, res) => {
-  // Return all data from event_data table
+  // Returns data from event_data table with a given event_id
   try {
     const { id } = req.params;
     const events = await pool.query('SELECT * FROM event_data WHERE event_id =$1', [id]);
