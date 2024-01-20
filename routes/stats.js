@@ -14,7 +14,7 @@ statsRouter.get('/', async (req, res) => {
       response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(2) : '0.00';
     res.json(totalTrash);
   } catch (err) {
-    console.error(err.message);
+    res.status(400).json(err);
   }
 });
 
@@ -28,7 +28,7 @@ statsRouter.get('/event/:eventId', async (req, res) => {
       response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(2) : '0.00';
     res.json(totalTrash);
   } catch (err) {
-    console.error(err.message);
+    res.status(400).json(err);
   }
 });
 
@@ -43,7 +43,7 @@ statsRouter.get('/volunteer/:volunteerId', async (req, res) => {
       response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(2) : '0.00';
     res.json(totalTrash);
   } catch (err) {
-    console.error(err.message);
+    res.status(400).json(err);
   }
 });
 
