@@ -16,6 +16,18 @@ eventsRouter.get('/', async (req, res) => {
   }
 });
 
+// GET /events/joined  Retreives all the data joined together
+eventsRouter.get('/joined', async (req, res) => {
+  try {
+    const allEvents = await pool.query(
+      'SELECT * FROM events INNER JOIN event_data ON events.id = CAST(event_data.event_id AS int) INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id',
+    );
+    res.status(200).json(allEvents.rows);
+  } catch (error) {
+    res.json(error);
+  }
+});
+
 // GET /events/:id  Returns the corresponding event row based on id
 eventsRouter.get('/:id', async (req, res) => {
   try {
