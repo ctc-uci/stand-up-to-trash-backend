@@ -20,7 +20,7 @@ eventsRouter.get('/', async (req, res) => {
 eventsRouter.get('/joined', async (req, res) => {
   try {
     const allEvents = await pool.query(
-      'SELECT * FROM events INNER JOIN event_data ON events.id = CAST(event_data.event_id AS int) INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id',
+      'SELECT event_data.id AS event_data_id, * FROM event_data INNER JOIN events ON events.id = event_data.event_id INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id',
     );
     res.status(200).json(allEvents.rows);
   } catch (error) {
