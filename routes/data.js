@@ -18,6 +18,18 @@ dataRouter.get('/', async (req, res) => {
   }
 });
 
+dataRouter.get('/:id', async (req, res) => {
+  // Returns data from event_data table with a given event_id
+  try {
+    const { id } = req.params;
+    const events = await pool.query('SELECT * FROM event_data WHERE event_id =$1', [id]);
+
+    res.status(200).json(events.rows);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
+
 dataRouter.post('/', async (req, res) => {
   // Add new event to event_data table, requires event info in body
   try {
@@ -99,6 +111,66 @@ dataRouter.delete('/:id', async (req, res) => {
     res.status(200).send(deleteStatus);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
+  try {
+    const { volunteerId } = req.params;
+    const volunteerData = await pool.query(
+      `SELECT *
+      FROM event_data D
+      WHERE D.volunteer_id = $1`,
+      [volunteerId],
+    );
+    res.status(200).json(volunteerData.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/event/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const eventData = await pool.query(
+      `SELECT *
+      FROM event_data D
+      WHERE D.event_id = $1`,
+      [eventId],
+    );
+    res.status(200).json(eventData.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
+  try {
+    const { volunteerId, eventId } = req.params;
+    const volAndEventData = await pool.query(
+      `SELECT *
+      FROM event_data D
+      WHERE D.event_id = $1 AND D.volunteer_id = $2
+      `,
+      [eventId, volunteerId],
+    );
+    res.status(200).json(volAndEventData.rows);
+  } catch (err) {
+    // console.log(err);
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.put('/checkin/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const allEvents = await pool.query(
+      `UPDATE event_data SET is_checked_in = NOT is_checked_in WHERE id = $1`,
+      [id],
+    );
+    res.status(200).json(allEvents);
+  } catch (error) {
+    res.json(error);
   }
 });
 
