@@ -99,7 +99,7 @@ statsRouter.get('/month', async (req, res) => {
     const ouncesTwo = parseFloat(responseTwo.rows[0].ounces_sum);
     const totalTwo = poundsTwo + ouncesTwo / 16;
     const rate = ((totalTwo - total) / total).toFixed(2);
-    res.json(totalTwo);
+    res.json(rate);
   } catch (err) {
     res.status(400).json(err);
   }
