@@ -7,6 +7,7 @@ const dataRouter = require('./routes/data');
 const emailRouter = require('./routes/nodemailer');
 const eventsRouter = require('./routes/events');
 const profilesRouter = require('./routes/profiles');
+const s3UploadRouter = require('./routes/s3upload');
 const statsRouter = require('./routes/stats');
 
 require('dotenv').config();
@@ -38,6 +39,7 @@ app.use('/send', emailRouter);
 app.use('/data', dataRouter);
 app.use('/events', eventsRouter);
 app.use('/profiles', profilesRouter);
+app.use('/s3upload', s3UploadRouter);
 app.use('/stats', statsRouter);
 
 app.listen(PORT, () => {

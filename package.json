@@ -16,6 +16,8 @@
     "*.js": "yarn run eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.504.0",
+    "aws-sdk": "^2.1549.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "eslint": "^8.1.0",
@@ -23,6 +25,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.0.0",
     "express": "^4.17.1",
+    "express-promise-router": "^4.1.1",
     "nodemailer": "^6.9.7",
     "nodemon": "^2.0.14",
     "pg": "^8.11.3",
