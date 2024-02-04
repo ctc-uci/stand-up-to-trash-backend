@@ -44,12 +44,9 @@ eventsRouter.post('/', async (req, res) => {
   try {
     const { name, description, location, imageUrl, date, time, waiver } = req.body;
     const newEvent = await pool.query(
-      'INSERT INTO events (name, description, location, image_url, waiver) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [name, description, location, imageUrl, waiver],
+      'INSERT INTO events (name, description, location, image_url, waiver, date, time) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [name, description, location, imageUrl, waiver, date, time],
     );
-    console.log(req.body);
-    console.log(date);
-    console.log(time);
     res.status(200).json(newEvent.rows[0]);
   } catch (error) {
     res.json(error);
