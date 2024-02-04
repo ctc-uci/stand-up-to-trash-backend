@@ -20,5 +20,5 @@ jobs:
           MONGO_URI: ${{ secrets.CTC_SLACKBOT_MONGO_URI }}
         with:
           script: |
-            const messageReviewer = require('./.github/workflows/scripts/reviewRequested');
+            const messageReviewer = require('./.github/workflows/scripts/reviewRequested.cjs');
             await messageReviewer({context});
