@@ -10,8 +10,6 @@ profilesRouter.use(express.json());
 profilesRouter.post('/', async (req, res) => {
   try {
     const { first_name, last_name, role, email, firebase_uid } = req.body;
-    // change this to new db
-    // first_name, last_name, role, email, firebase_uid, image_url
     const newProfile = await pool.query(
       'INSERT INTO users (first_name, last_name, role, email, firebase_uid) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [first_name, last_name, role, email, firebase_uid],
@@ -43,11 +41,10 @@ profilesRouter.get('/:id', async (req, res) => {
 
 profilesRouter.put('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const { first_name, last_name, role, email, firebase_uid, image_url } = req.body;
+    const { first_name, last_name, role, email, firebase_uid } = req.body;
     const updateProfile = await pool.query(
       'UPDATE users SET first_name = $1, last_name = $2, role = $3, email = $4 WHERE id = $5 RETURNING *',
-      [email, first_name, last_name, id],
+      [first_name, last_name, role, email, firebase_uid],
     );
     res.status(200).json(updateProfile.rows[0]);
   } catch (error) {
