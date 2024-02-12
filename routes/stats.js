@@ -115,7 +115,6 @@ statsRouter.get('/month', async (req, res) => {
     const responseTwo = await pool.query(
       `SELECT SUM(pounds) AS pound_sum, SUM(ounces) AS ounces_sum FROM event_data INNER JOIN events on event_data.event_id=events.id WHERE events.date BETWEEN CURRENT_DATE - INTERVAL '2 months' AND CURRENT_DATE - INTERVAL '1 month' `,
     );
-    console.log(responseTwo);
     const poundsTwo =
       responseTwo.rows[0].pound_sum != null ? parseFloat(responseTwo.rows[0].pound_sum) : 0;
     const ouncesTwo =
