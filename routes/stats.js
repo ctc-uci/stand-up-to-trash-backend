@@ -19,6 +19,17 @@ statsRouter.get('/', async (req, res) => {
   }
 });
 
+statsRouter.get('/leaderboard', async (req, res) => {
+  try {
+    const response = await pool.query(
+      'SELECT e.id, e.pounds, e.ounces, (e.pounds + e.ounces / 16.0) as total_weight, v.first_name AS volunteer_first_name, v.last_name AS volunteer_last_name FROM event_data e INNER JOIN volunteers v ON e.volunteer_id = v.id ORDER BY e.pounds DESC, e.ounces DESC LIMIT 3;',
+    );
+    res.json(response.rows);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 statsRouter.get('/event/:eventId', async (req, res) => {
   try {
     const { eventId } = req.params;
