@@ -6,10 +6,10 @@ const pool = require('../server/db');
 
 eventsRouter.use(express.json());
 
-// GET /events  Returns all event rows in the events table
+// GET /events  Returns all event rows in the events table where it is not archived
 eventsRouter.get('/', async (req, res) => {
   try {
-    const allEvents = await pool.query('SELECT * FROM events');
+    const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = false');
     res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
@@ -22,6 +22,16 @@ eventsRouter.get('/joined', async (req, res) => {
     const allEvents = await pool.query(
       'SELECT event_data.id AS event_data_id, * FROM event_data INNER JOIN events ON events.id = event_data.event_id INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id',
     );
+    res.status(200).json(allEvents.rows);
+  } catch (error) {
+    res.json(error);
+  }
+});
+
+// GET /archiveEvents  Returns all event rows in the events table where it is not archived
+eventsRouter.get('/archiveEvents', async (req, res) => {
+  try {
+    const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = true');
     res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
@@ -65,6 +75,24 @@ eventsRouter.put('/:id', async (req, res) => {
     res.status(200).json(updatedEvent.rows[0]);
   } catch (error) {
     res.json(error);
+  }
+});
+
+// PUT /events/:id/archive  Sets an event's is_archived field to true
+eventsRouter.put('/:id/archive', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Update the event's is_archived field to true
+    const archivedEvent = await pool.query(
+      'UPDATE events SET is_archived = true WHERE id = $1 RETURNING *',
+      [id],
+    );
+    if (archivedEvent.rowCount === 0) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    res.status(200).json({ message: 'Event archived successfully.', event: archivedEvent.rows[0] });
+  } catch (error) {
+    res.json({ message: 'Error archiving event', error: error.message });
   }
 });
 
