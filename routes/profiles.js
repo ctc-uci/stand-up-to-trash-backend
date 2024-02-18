@@ -32,7 +32,7 @@ profilesRouter.get('/', async (req, res) => {
 // grabs only admin role from profiles
 profilesRouter.get('/admin', async (req, res) => {
   try {
-    const allProfiles = await pool.query("SELECT * FROM users WHERE role='admin'");
+    const allProfiles = await pool.query("SELECT * FROM users WHERE LOWER(role) = 'admin'");
     res.status(200).json(allProfiles.rows);
   } catch (error) {
     res.status(400).json(error);
