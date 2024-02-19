@@ -19,6 +19,17 @@ statsRouter.get('/', async (req, res) => {
   }
 });
 
+statsRouter.get('/participants', async (req, res) => {
+  try {
+    const response = await pool.query('SELECT SUM(number_in_party) FROM event_data');
+    const totalParticipant =
+      response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(1) : '0.00';
+    res.json(totalParticipant);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 statsRouter.get('/leaderboard', async (req, res) => {
   try {
     const response = await pool.query(
