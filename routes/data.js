@@ -61,11 +61,10 @@ dataRouter.post('/', async (req, res) => {
   }
 });
 
-dataRouter.post('/guestCheckin/:event_id', async (req, res) => {
+dataRouter.post('/guestCheckin', async (req, res) => {
   // Add new event to event_data table, requires event info in body
   try {
-    const { volunteer_id } = req.body;
-    const { event_id } = req.params;
+    const { volunteer_id, event_id } = req.body;
 
     const postQuery =
       'INSERT INTO event_data ( volunteer_id, event_id, is_checked_in) VALUES ($1, $2, $3);';
