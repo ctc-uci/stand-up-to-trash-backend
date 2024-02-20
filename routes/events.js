@@ -38,6 +38,25 @@ eventsRouter.get('/archiveEvents', async (req, res) => {
   }
 });
 
+// PUT /events/:id/archive  Sets an event's is_archived field to true
+eventsRouter.put('/archive/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Update the event's is_archived field to true
+    const archivedEvent = await pool.query(
+      'UPDATE events SET is_archived = true WHERE id = $1 RETURNING *',
+      [id],
+    );
+    if (archivedEvent.rowCount === 0) {
+      res.status(404).json({ message: 'Event not found' });
+      return; // Ensure function exits after sending response
+    }
+    res.status(200).json({ message: 'Event archived successfully.', event: archivedEvent.rows[0] });
+  } catch (error) {
+    res.json({ message: 'Error archiving event', error: error.message });
+  }
+});
+
 // GET /events/:id  Returns the corresponding event row based on id
 eventsRouter.get('/:id', async (req, res) => {
   try {
@@ -75,24 +94,6 @@ eventsRouter.put('/:id', async (req, res) => {
     res.status(200).json(updatedEvent.rows[0]);
   } catch (error) {
     res.json(error);
-  }
-});
-
-// PUT /events/:id/archive  Sets an event's is_archived field to true
-eventsRouter.put('/:id/archive', async (req, res) => {
-  try {
-    const { id } = req.params;
-    // Update the event's is_archived field to true
-    const archivedEvent = await pool.query(
-      'UPDATE events SET is_archived = true WHERE id = $1 RETURNING *',
-      [id],
-    );
-    if (archivedEvent.rowCount === 0) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-    res.status(200).json({ message: 'Event archived successfully.', event: archivedEvent.rows[0] });
-  } catch (error) {
-    res.json({ message: 'Error archiving event', error: error.message });
   }
 });
 
