@@ -61,6 +61,21 @@ dataRouter.post('/', async (req, res) => {
   }
 });
 
+dataRouter.post('/guestCheckin', async (req, res) => {
+  // Add new event to event_data table, requires event info in body
+  try {
+    const { volunteer_id, event_id } = req.body;
+
+    const postQuery =
+      'INSERT INTO event_data ( volunteer_id, event_id, is_checked_in) VALUES ($1, $2, $3);';
+    const eventData = [volunteer_id, event_id, false];
+    const insertedStatus = await pool.query(postQuery, eventData);
+    res.status(200).json(insertedStatus);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 dataRouter.put('/:id', async (req, res) => {
   // Update event data by ID
   try {

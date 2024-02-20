@@ -20,6 +20,19 @@ profilesRouter.post('/', async (req, res) => {
   }
 });
 
+profilesRouter.post('/guest', async (req, res) => {
+  try {
+    const { first_name, last_name, email } = req.body;
+    const newGuestProfile = await pool.query(
+      'INSERT INTO users (first_name, last_name, role, email) VALUES ($1, $2, $3, $4) RETURNING *',
+      [first_name, last_name, 'guest', email],
+    );
+    res.status(201).json(newGuestProfile.rows[0]);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
 profilesRouter.get('/', async (req, res) => {
   try {
     const allProfiles = await pool.query('SELECT * FROM users');
