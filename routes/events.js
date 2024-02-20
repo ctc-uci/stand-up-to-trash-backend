@@ -28,7 +28,21 @@ eventsRouter.get('/joined', async (req, res) => {
   }
 });
 
-// GET /archiveEvents  Returns all event rows in the events table where it is not archived
+// GET /events/joined/:id  Retreives all the data joined together
+eventsRouter.get('/joined/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const allEvents = await pool.query(
+      'SELECT event_data.id AS event_data_id, * FROM event_data INNER JOIN events ON events.id = event_data.event_id INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id WHERE events.id = $1',
+      [id],
+    );
+    res.status(200).json(allEvents.rows);
+  } catch (error) {
+    res.json(error);
+  }
+});
+
 eventsRouter.get('/archiveEvents', async (req, res) => {
   try {
     const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = true');
