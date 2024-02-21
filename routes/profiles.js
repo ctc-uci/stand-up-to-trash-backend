@@ -9,10 +9,10 @@ profilesRouter.use(express.json());
 
 profilesRouter.post('/', async (req, res) => {
   try {
-    const { first_name, last_name, role, email, firebase_uid } = req.body;
+    const { first_name, last_name, role, email, firebase_uid, imageUrl } = req.body;
     const newProfile = await pool.query(
-      'INSERT INTO users (first_name, last_name, role, email, firebase_uid) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [first_name, last_name, role, email, firebase_uid],
+      'INSERT INTO users (first_name, last_name, role, email, firebase_uid, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [first_name, last_name, role, email, firebase_uid, imageUrl],
     );
     res.status(201).json(newProfile.rows[0]);
   } catch (error) {
@@ -52,10 +52,10 @@ profilesRouter.get('/:id', async (req, res) => {
 profilesRouter.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { first_name, last_name, role, email } = req.body;
+    const { first_name, last_name, role, email, imageUrl } = req.body;
     const updateProfile = await pool.query(
-      'UPDATE users SET first_name = $1, last_name = $2, role = $3, email = $4 WHERE id = $5 RETURNING *',
-      [first_name, last_name, role, email, id],
+      'UPDATE users SET first_name = $1, last_name = $2, role = $3, email = $4, image_url = $5 WHERE id = $6 RETURNING *',
+      [first_name, last_name, role, email, imageUrl, id],
     );
     res.status(200).json(updateProfile.rows[0]);
   } catch (error) {
