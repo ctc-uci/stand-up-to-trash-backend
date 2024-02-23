@@ -9,9 +9,9 @@ require('dotenv').config();
 dataRouter.use(express.json());
 
 dataRouter.get('/', async (req, res) => {
-  // Return all data from event_data table
+  // Return all data from event_data_new table
   try {
-    const events = await pool.query('SELECT * FROM event_data');
+    const events = await pool.query('SELECT * FROM event_data_new');
     res.status(200).json(events.rows);
   } catch (err) {
     res.status(500).json(err.message);
@@ -19,10 +19,10 @@ dataRouter.get('/', async (req, res) => {
 });
 
 dataRouter.get('/:id', async (req, res) => {
-  // Returns data from event_data table with a given event_id
+  // Returns data from event_data_new table with a given event_id
   try {
     const { id } = req.params;
-    const events = await pool.query('SELECT * FROM event_data WHERE event_id =$1', [id]);
+    const events = await pool.query('SELECT * FROM event_data_new WHERE event_id =$1', [id]);
 
     res.status(200).json(events.rows);
   } catch (err) {
@@ -31,7 +31,7 @@ dataRouter.get('/:id', async (req, res) => {
 });
 
 dataRouter.post('/', async (req, res) => {
-  // Add new event to event_data table, requires event info in body
+  // Add new event to event_data_new table, requires event info in body
   try {
     const {
       volunteer_id,
@@ -44,7 +44,7 @@ dataRouter.post('/', async (req, res) => {
     } = req.body;
 
     const postQuery =
-      'INSERT INTO event_data ( volunteer_id, number_in_party, pounds, ounces, unusual_items, event_id, is_checked_in) VALUES ($1, $2, $3, $4, $5, $6, $7);';
+      'INSERT INTO event_data_new ( volunteer_id, number_in_party, pounds, ounces, unusual_items, event_id, is_checked_in) VALUES ($1, $2, $3, $4, $5, $6, $7);';
     const eventData = [
       volunteer_id,
       number_in_party,
@@ -62,12 +62,12 @@ dataRouter.post('/', async (req, res) => {
 });
 
 dataRouter.post('/guestCheckin', async (req, res) => {
-  // Add new event to event_data table, requires event info in body
+  // Add new event to event_data_new table, requires event info in body
   try {
     const { volunteer_id, event_id } = req.body;
 
     const postQuery =
-      'INSERT INTO event_data ( volunteer_id, event_id, is_checked_in) VALUES ($1, $2, $3);';
+      'INSERT INTO event_data_new ( volunteer_id, event_id, is_checked_in) VALUES ($1, $2, $3);';
     const eventData = [volunteer_id, event_id, false];
     const insertedStatus = await pool.query(postQuery, eventData);
     res.status(200).json(insertedStatus);
@@ -97,7 +97,7 @@ dataRouter.put('/:id', async (req, res) => {
       res.status(400).send('Invalid ID');
     } else {
       const putQuery =
-        'UPDATE event_data SET volunteer_id = $1, number_in_party = $2, pounds = $3, ounces = $4, unusual_items = $5, event_id = $6, is_checked_in = $7 WHERE id = $8';
+        'UPDATE event_data_new SET volunteer_id = $1, number_in_party = $2, pounds = $3, ounces = $4, unusual_items = $5, event_id = $6, is_checked_in = $7 WHERE id = $8';
       const parameterValues = [
         volunteer_id,
         number_in_party,
@@ -120,7 +120,7 @@ dataRouter.delete('/:id', async (req, res) => {
   // Delete event by ID
   try {
     const { id } = req.params;
-    const delQuery = 'DELETE FROM event_data WHERE id = $1';
+    const delQuery = 'DELETE FROM event_data_new WHERE id = $1';
     const delId = [id];
     const deleteStatus = await pool.query(delQuery, delId);
     res.status(200).send(deleteStatus);
@@ -134,7 +134,7 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
     const { volunteerId } = req.params;
     const volunteerData = await pool.query(
       `SELECT *
-      FROM event_data D
+      FROM event_data_new D
       WHERE D.volunteer_id = $1`,
       [volunteerId],
     );
@@ -149,7 +149,7 @@ dataRouter.get('/event/:eventId', async (req, res) => {
     const { eventId } = req.params;
     const eventData = await pool.query(
       `SELECT *
-      FROM event_data D
+      FROM event_data_new D
       WHERE D.event_id = $1`,
       [eventId],
     );
@@ -164,7 +164,7 @@ dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
     const { volunteerId, eventId } = req.params;
     const volAndEventData = await pool.query(
       `SELECT *
-      FROM event_data D
+      FROM event_data_new D
       WHERE D.event_id = $1 AND D.volunteer_id = $2
       `,
       [eventId, volunteerId],
@@ -180,7 +180,7 @@ dataRouter.put('/checkin/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const allEvents = await pool.query(
-      `UPDATE event_data SET is_checked_in = NOT is_checked_in WHERE id = $1`,
+      `UPDATE event_data_new SET is_checked_in = true WHERE id = $1`,
       [id],
     );
     res.status(200).json(allEvents);
