@@ -10,10 +10,17 @@ profilesRouter.use(express.json());
 profilesRouter.post('/', async (req, res) => {
   try {
     const { first_name, last_name, role, email, firebase_uid, imageUrl } = req.body;
-    const newProfile = await pool.query(
-      'INSERT INTO users (first_name, last_name, role, email, firebase_uid, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [first_name, last_name, role, email, firebase_uid, imageUrl],
-    );
+    const queryValues = [first_name, last_name, role, email, firebase_uid];
+    let query = 'INSERT INTO users (first_name, last_name, role, email, firebase_uid';
+
+    if (imageUrl !== undefined) {
+      query += ', image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+      queryValues.push(imageUrl);
+    } else {
+      query += ') VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    }
+
+    const newProfile = await pool.query(query, queryValues);
     res.status(201).json(newProfile.rows[0]);
   } catch (error) {
     res.status(400).json(error);
