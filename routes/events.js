@@ -9,7 +9,9 @@ eventsRouter.use(express.json());
 // GET /events  Returns all event rows in the events table where it is not archived
 eventsRouter.get('/', async (req, res) => {
   try {
-    const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = false');
+    const allEvents = await pool.query(
+      'SELECT * FROM events WHERE is_archived = false ORDER BY date DESC',
+    );
     res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
@@ -45,7 +47,9 @@ eventsRouter.get('/joined/:id', async (req, res) => {
 
 eventsRouter.get('/archiveEvents', async (req, res) => {
   try {
-    const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = true');
+    const allEvents = await pool.query(
+      'SELECT * FROM events WHERE is_archived = true ORDER BY date DESC',
+    );
     res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
