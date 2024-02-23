@@ -103,4 +103,14 @@ profilesRouter.delete('/:id', async (req, res) => {
   }
 });
 
+profilesRouter.get('/firebase/:uid', async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const profile = await pool.query('SELECT * FROM users WHERE firebase_uid = $1', [uid]);
+    res.status(200).json(profile.rows[0]);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+});
+
 module.exports = profilesRouter;
