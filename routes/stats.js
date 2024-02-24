@@ -41,6 +41,19 @@ statsRouter.get('/leaderboard', async (req, res) => {
   }
 });
 
+statsRouter.get('/leaderboard/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const response = await pool.query(
+      'SELECT e.volunteer_id, v.first_name AS volunteer_first_name, v.last_name AS volunteer_last_name, SUM(e.pounds + e.ounces / 16.0) AS total_weight FROM event_data e INNER JOIN volunteers v ON e.volunteer_id = v.id WHERE e.event_id = $1 GROUP BY e.volunteer_id, v.first_name, v.last_name ORDER BY total_weight DESC LIMIT 3;',
+      [eventId],
+    );
+    res.json(response.rows);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 statsRouter.get('/event/:eventId', async (req, res) => {
   try {
     const { eventId } = req.params;
