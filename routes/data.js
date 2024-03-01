@@ -260,9 +260,9 @@ dataRouter.delete('/image/list/:id/:eventImageKey', async (req, res) => {
   }
 });
 
-dataRouter.get('/image/:id', async (req, res) => {
+dataRouter.get('/image/:eventId', async (req, res) => {
   try {
-    const { id } = req.params;
+    const { eventId } = req.params;
     const events = await pool.query(
       `SELECT id, name, s3_url
       FROM (
@@ -271,7 +271,7 @@ dataRouter.get('/image/:id', async (req, res) => {
         WHERE event_data_new.id = $1
       ) AS image_ids
       JOIN event_data_images ON event_data_images.id = image_ids.unnest_column`,
-      [id],
+      [eventId],
     );
     res.status(200).json(events.rows);
   } catch (err) {
