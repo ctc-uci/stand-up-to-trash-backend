@@ -203,11 +203,11 @@ dataRouter.post('/image/', async (req, res) => {
   }
 });
 
-dataRouter.get('/image/id', async (req, res) => {
+dataRouter.get('/image/url/:s3URL', async (req, res) => {
   try {
-    const { s3_url } = req.body;
+    const { s3URL } = req.params;
     const getIDQuery = 'SELECT id FROM event_data_images WHERE s3_url = $1;';
-    const eventData = [s3_url];
+    const eventData = [s3URL];
     const getStatus = await pool.query(getIDQuery, eventData);
 
     res.status(200).json(getStatus);
@@ -264,15 +264,13 @@ dataRouter.get('/image/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const events = await pool.query(
-      `SELECT event_data_images.name
-    FROM (
-          SELECT
-            unnest_column
-          FROM
-            event_data_new, UNNEST(event_data_new.image_array) AS unnest_column
-          WHERE event_data_new.id = $1
-          ) AS image_ids, event_data_images
-    WHERE event_data_images.id = image_ids.unnest_column`,
+      `SELECT id, name, s3_url
+      FROM (
+        SELECT unnest_column
+        FROM event_data_new, UNNEST(event_data_new.image_array) AS unnest_column
+        WHERE event_data_new.id = $1
+      ) AS image_ids
+      JOIN event_data_images ON event_data_images.id = image_ids.unnest_column`,
       [id],
     );
     res.status(200).json(events.rows);
