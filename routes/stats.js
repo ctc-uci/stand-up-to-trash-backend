@@ -83,6 +83,36 @@ statsRouter.get('/volunteer/:volunteerId', async (req, res) => {
   }
 });
 
+statsRouter.get('/register/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const response = await pool.query(
+      'SELECT SUM(number_in_party) FROM event_data INNER JOIN events on event_data.event_id=events.id WHERE event_id = $1',
+      [eventId],
+    );
+    const totalPeople =
+      response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(1) : '0.00';
+    res.json(totalPeople);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+statsRouter.get('/checkin/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const response = await pool.query(
+      'SELECT SUM(number_in_party) FROM event_data INNER JOIN events on event_data.event_id=events.id WHERE event_id = $1 and event_data.is_checked_in=true',
+      [eventId],
+    );
+    const totalPeople =
+      response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(1) : '0.00';
+    res.json(totalPeople);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 statsRouter.get('/week', async (req, res) => {
   try {
     const response = await pool.query(
