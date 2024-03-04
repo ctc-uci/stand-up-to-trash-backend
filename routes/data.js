@@ -189,4 +189,94 @@ dataRouter.put('/checkin/:id', async (req, res) => {
   }
 });
 
+dataRouter.post('/image/', async (req, res) => {
+  try {
+    const { s3_url } = req.body;
+    const postQuery = 'INSERT INTO event_data_images (s3_url) VALUES ($1);';
+    const eventData = [s3_url];
+    const insertedStatus = await pool.query(postQuery, eventData);
+
+    res.status(200).json(insertedStatus);
+    // res.status(200).json("get-image: ", getStatus);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/image/url/:s3URL', async (req, res) => {
+  try {
+    const { s3URL } = req.params;
+    const getIDQuery = 'SELECT id FROM event_data_images WHERE s3_url = $1;';
+    const eventData = [s3URL];
+    const getStatus = await pool.query(getIDQuery, eventData);
+
+    res.status(200).json(getStatus);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.put('/image/list/:id/:eventImageKey', async (req, res) => {
+  try {
+    const { id, eventImageKey } = req.params;
+    const postQuery =
+      'UPDATE event_data_new SET image_array = image_array || ARRAY[CAST ($2 AS INTEGER)] WHERE id = $1;';
+    const eventData = [id, eventImageKey];
+    const insertedStatus = await pool.query(postQuery, eventData);
+
+    res.status(200).json(insertedStatus);
+    // res.status(200).json("get-image: ", getStatus);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.delete('/image/:id', async (req, res) => {
+  // Delete event by ID from the event_data_images table
+  try {
+    const { id } = req.params;
+    const delQuery = 'DELETE FROM event_data_images WHERE id = $1';
+    const delId = [id];
+    const deleteStatus = await pool.query(delQuery, delId);
+    res.status(200).send(deleteStatus);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.delete('/image/list/:id/:eventImageKey', async (req, res) => {
+  // Delete event by ID from the event_data_images table
+  try {
+    const { id, eventImageKey } = req.params;
+    const deleteStatus = await pool.query(
+      `UPDATE event_data_new
+      SET image_array = ARRAY_REMOVE(image_array, CAST ($2 AS INTEGER))
+      WHERE id = $1;`,
+      [id, eventImageKey],
+    );
+    res.status(200).send(deleteStatus);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/image/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const events = await pool.query(
+      `SELECT id, name, s3_url
+      FROM (
+        SELECT unnest_column
+        FROM event_data_new, UNNEST(event_data_new.image_array) AS unnest_column
+        WHERE event_data_new.id = $1
+      ) AS image_ids
+      JOIN event_data_images ON event_data_images.id = image_ids.unnest_column`,
+      [eventId],
+    );
+    res.status(200).json(events.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 module.exports = dataRouter;
