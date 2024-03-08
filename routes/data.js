@@ -189,6 +189,22 @@ dataRouter.put('/checkin/:id', async (req, res) => {
   }
 });
 
+dataRouter.patch('/checkin/:eventId/:volunteerId', async (req, res) => {
+  try {
+    const { eventId, volunteerId } = req.params;
+    await pool.query(
+      `UPDATE event_data_new
+      SET is_checked_in = true
+      WHERE event_id = $1 AND volunteer_id = $2;`,
+      [eventId, volunteerId],
+    );
+
+    res.status(200);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 dataRouter.post('/image/', async (req, res) => {
   try {
     const { s3_url } = req.body;
