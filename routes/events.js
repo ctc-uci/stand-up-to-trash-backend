@@ -9,7 +9,9 @@ eventsRouter.use(express.json());
 // GET /events  Returns all event rows in the events table where it is not archived
 eventsRouter.get('/', async (req, res) => {
   try {
-    const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = false');
+    const allEvents = await pool.query(
+      'SELECT * FROM events WHERE is_archived = false ORDER BY date DESC',
+    );
     res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
@@ -20,7 +22,7 @@ eventsRouter.get('/', async (req, res) => {
 eventsRouter.get('/joined', async (req, res) => {
   try {
     const allEvents = await pool.query(
-      'SELECT event_data.id AS event_data_id, * FROM event_data INNER JOIN events ON events.id = event_data.event_id INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id',
+      'SELECT event_data_new.id AS event_data_new_id, * FROM event_data_new INNER JOIN events ON events.id = event_data_new.event_id INNER JOIN users ON users.id = event_data_new.volunteer_id',
     );
     res.status(200).json(allEvents.rows);
   } catch (error) {
@@ -34,7 +36,7 @@ eventsRouter.get('/joined/:id', async (req, res) => {
     const { id } = req.params;
 
     const allEvents = await pool.query(
-      'SELECT event_data.id AS event_data_id, * FROM event_data INNER JOIN events ON events.id = event_data.event_id INNER JOIN volunteers ON volunteers.id = event_data.volunteer_id WHERE events.id = $1',
+      'SELECT event_data_new.id AS event_data_new_id, * FROM event_data_new INNER JOIN events ON events.id = event_data_new.event_id INNER JOIN users ON users.id = event_data_new.volunteer_id WHERE events.id = $1',
       [id],
     );
     res.status(200).json(allEvents.rows);
@@ -45,7 +47,9 @@ eventsRouter.get('/joined/:id', async (req, res) => {
 
 eventsRouter.get('/archiveEvents', async (req, res) => {
   try {
-    const allEvents = await pool.query('SELECT * FROM events WHERE is_archived = true');
+    const allEvents = await pool.query(
+      'SELECT * FROM events WHERE is_archived = true ORDER BY date DESC',
+    );
     res.status(200).json(allEvents.rows);
   } catch (error) {
     res.json(error);
