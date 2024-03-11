@@ -180,7 +180,7 @@ dataRouter.put('/checkin/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const allEvents = await pool.query(
-      `UPDATE event_data_new SET is_checked_in = true WHERE id = $1`,
+      `UPDATE event_data_new SET is_checked_in = NOT is_checked_in WHERE id = $1`,
       [id],
     );
     res.status(200).json(allEvents);
@@ -194,7 +194,7 @@ dataRouter.patch('/checkin/:eventId/:volunteerId', async (req, res) => {
     const { eventId, volunteerId } = req.params;
     await pool.query(
       `UPDATE event_data_new
-      SET is_checked_in = true
+      SET is_checked_in = NOT is_checked_in
       WHERE event_id = $1 AND volunteer_id = $2;`,
       [eventId, volunteerId],
     );
