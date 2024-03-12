@@ -246,4 +246,39 @@ statsRouter.get('/participants/month', async (req, res) => {
   }
 });
 
+statsRouter.get('/registered', async (req, res) => {
+  try {
+    const response = await pool.query(`SELECT COUNT(*) FROM event_data`);
+    const total = response.rows[0].count != null ? parseFloat(response.rows[0].count) : 0;
+    res.json(total.toFixed(1));
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+statsRouter.get('/checkedIn', async (req, res) => {
+  try {
+    const response = await pool.query(`SELECT COUNT(*) FROM event_data WHERE is_checked_in = true`);
+    const total = response.rows[0].count != null ? parseFloat(response.rows[0].count) : 0;
+    res.json(total.toFixed(1));
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+statsRouter.get('/total', async (req, res) => {
+  try {
+    const response = await pool.query(
+      `SELECT SUM(pounds) AS pound_sum, SUM(ounces) AS ounces_sum FROM event_data`,
+    );
+    const pounds = response.rows[0].pounds_sum != null ? parseFloat(response.rows[0].pound_sum) : 0;
+    const ounces =
+      response.rows[0].ounces_sum != null ? parseFloat(response.rows[0].ounces_sum) : 0;
+    const total = pounds + ounces / 16;
+    res.json(total.toFixed(1));
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 module.exports = statsRouter;
