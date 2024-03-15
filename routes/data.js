@@ -325,7 +325,6 @@ dataRouter.get('/images/:volunteerId', async (req, res) => {
       [volunteerId],
     );
 
-    // Initialize an array to store image URLs
     const imageUrls = result.rows.map((row) => row.s3_url);
     res.status(200).json(imageUrls);
   } catch (err) {
