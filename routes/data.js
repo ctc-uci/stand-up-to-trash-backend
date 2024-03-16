@@ -129,6 +129,24 @@ dataRouter.delete('/:id', async (req, res) => {
   }
 });
 
+dataRouter.get('/volunteer/:volunteerId/event', async (req, res) => {
+  // retrive a list of event names associated with the volunteerID
+  try {
+    const { volunteerId } = req.params;
+    const volunteerData = await pool.query(
+      `SELECT E.name
+      FROM event_data_new D
+      INNER JOIN events E ON D.event_id = E.id
+      WHERE D.volunteer_id = $1`,
+      [volunteerId],
+    );
+    const eventNames = volunteerData.rows.map((row) => row.name);
+    res.status(200).json(eventNames);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
   try {
     const { volunteerId } = req.params;
@@ -155,23 +173,6 @@ dataRouter.get('/event/:eventId', async (req, res) => {
     );
     res.status(200).json(eventData.rows);
   } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
-dataRouter.get('/volunteer/:volunteerId/event/:eventId', async (req, res) => {
-  try {
-    const { volunteerId, eventId } = req.params;
-    const volAndEventData = await pool.query(
-      `SELECT *
-      FROM event_data_new D
-      WHERE D.event_id = $1 AND D.volunteer_id = $2
-      `,
-      [eventId, volunteerId],
-    );
-    res.status(200).json(volAndEventData.rows);
-  } catch (err) {
-    // console.log(err);
     res.status(500).send(err.message);
   }
 });
@@ -295,4 +296,22 @@ dataRouter.get('/image/:eventId', async (req, res) => {
   }
 });
 
+// get all volunteers and how many events they are in
+dataRouter.get('/allVolunteers/counts', async (req, res) => {
+  try {
+    const profileEventCount = await pool.query(
+      `SELECT DISTINCT Us.id, Us.image_url, Us.first_name, Us.last_name, U.total
+      FROM (
+        SELECT U.id, COUNT(E.volunteer_id) AS total
+        FROM event_data_new E, users U
+        WHERE E.volunteer_id = U.id
+        GROUP BY U.id
+        ) as U, users as Us, event_data_new as E
+      WHERE U.id = Us.id AND U.id = E.volunteer_id
+      `);
+    res.status(200).json(profileEventCount.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 module.exports = dataRouter;
