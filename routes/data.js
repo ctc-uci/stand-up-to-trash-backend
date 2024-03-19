@@ -144,6 +144,24 @@ dataRouter.get('/volunteer/:volunteerId', async (req, res) => {
   }
 });
 
+dataRouter.get('/volunteer/:volunteerId/event', async (req, res) => {
+  // retrive a list of event names associated with the volunteerID
+  try {
+    const { volunteerId } = req.params;
+    const volunteerData = await pool.query(
+      `SELECT E.name
+      FROM event_data_new D
+      INNER JOIN events E ON D.event_id = E.id
+      WHERE D.volunteer_id = $1`,
+      [volunteerId],
+    );
+    const eventNames = volunteerData.rows.map((row) => row.name);
+    res.status(200).json(eventNames);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 dataRouter.get('/event/:eventId', async (req, res) => {
   try {
     const { eventId } = req.params;
@@ -290,6 +308,25 @@ dataRouter.get('/image/:eventId', async (req, res) => {
       [eventId],
     );
     res.status(200).json(events.rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+dataRouter.get('/images/:volunteerId', async (req, res) => {
+  try {
+    const { volunteerId } = req.params;
+    const result = await pool.query(
+      `SELECT DISTINCT E.s3_url
+      FROM event_data_new D
+      JOIN LATERAL unnest(D.image_array) AS image_id ON true
+      JOIN event_data_images E ON E.id = image_id
+      WHERE D.volunteer_id = $1`,
+      [volunteerId],
+    );
+
+    const imageUrls = result.rows.map((row) => row.s3_url);
+    res.status(200).json(imageUrls);
   } catch (err) {
     res.status(500).send(err.message);
   }
