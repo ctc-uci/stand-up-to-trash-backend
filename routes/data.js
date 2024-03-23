@@ -158,15 +158,29 @@ dataRouter.get('/volunteer/:volunteerId/event', async (req, res) => {
 dataRouter.get('/event/:eventId', async (req, res) => {
   try {
     const { eventId } = req.params;
-    const eventData = await pool.query(
-      `SELECT *
+
+    // Updated query to join event_data_new with trash_bags and aggregate trash bags as an array
+    const query = `
+      SELECT D.*, ARRAY_AGG(
+        JSON_BUILD_OBJECT(
+          'bag_id', T.bag_id,
+          'event_data_key', T.event_data_key,
+          'pounds', T.pounds
+        )
+      ) FILTER (WHERE T.bag_id IS NOT NULL) AS trash_bags
       FROM event_data_new D
-      WHERE D.event_id = $1`,
-      [eventId],
-    );
-    res.status(200).json(eventData.rows);
+      LEFT JOIN trash_bags T ON D.id = T.event_data_key
+      WHERE D.event_id = $1
+      GROUP BY D.id
+    `;
+
+    const result = await pool.query(query, [eventId]);
+
+    // Respond with the event data and included trash bags
+    res.status(200).json(result.rows);
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error('Error retrieving event data with trash bags:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

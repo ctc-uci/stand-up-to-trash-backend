@@ -31,17 +31,59 @@ eventsRouter.get('/joined', async (req, res) => {
 });
 
 // GET /events/joined/:id  Retreives all the data joined together
+// eventsRouter.get('/joined/:id', async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const allEvents = await pool.query(
+//       'SELECT event_data_new.id AS event_data_new_id, * FROM event_data_new INNER JOIN events ON events.id = event_data_new.event_id INNER JOIN users ON users.id = event_data_new.volunteer_id WHERE events.id = $1',
+//       [id],
+//     );
+//     res.status(200).json(allEvents.rows);
+//   } catch (error) {
+//     res.json(error);
+//   }
+// });
+
 eventsRouter.get('/joined/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
     const allEvents = await pool.query(
-      'SELECT event_data_new.id AS event_data_new_id, * FROM event_data_new INNER JOIN events ON events.id = event_data_new.event_id INNER JOIN users ON users.id = event_data_new.volunteer_id WHERE events.id = $1',
+      `SELECT 
+        edn.id AS event_data_new_id, edn.*, 
+        e.*, u.*, 
+        ARRAY_AGG(tb.pounds::text) FILTER (WHERE tb.pounds IS NOT NULL) AS trash_bags
+      FROM event_data_new edn
+      INNER JOIN events e ON e.id = edn.event_id
+      INNER JOIN users u ON u.id = edn.volunteer_id
+      LEFT JOIN trash_bags tb ON tb.event_data_key = edn.id
+      WHERE e.id = $1
+      GROUP BY edn.id, e.id, u.id`,
       [id],
     );
-    res.status(200).json(allEvents.rows);
+
+    const modifiedRows = allEvents.rows.map((row) => {
+      // Create a new object to avoid mutating the 'row' parameter
+      const newRow = { ...row };
+
+      // Check if trash_bags is null and default to an empty array if so
+      if (!newRow.trash_bags) {
+        newRow.trash_bags = [];
+      } else {
+        // Ensure trash_bags contains only numeric values, excluding 'NULL' and null
+        newRow.trash_bags = newRow.trash_bags
+          .filter((pounds) => pounds !== 'NULL' && pounds != null)
+          .map((pounds) => parseFloat(pounds)); // Convert to numbers
+      }
+
+      return newRow; // Return the modified object
+    });
+
+    res.status(200).json(modifiedRows);
   } catch (error) {
-    res.json(error);
+    console.error('Error joining event data:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
