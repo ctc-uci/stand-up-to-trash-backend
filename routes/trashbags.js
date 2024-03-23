@@ -29,15 +29,22 @@ trashBagsRouter.get('/:eventDataKey', async (req, res) => {
   }
 });
 
-trashBagsRouter.post('/', async (req, res) => {
+trashBagsRouter.put('/:eventDataId', async (req, res) => {
   try {
-    const { trashBags, eventDataKey } = req.body;
-    const query = 'INSERT INTO trash_bags (event_data_key, pounds) VALUES ($1, $2) RETURNING *';
+    const { eventDataId } = req.params;
+    const { trashBags } = req.body;
+    const deleteQuery = 'DELETE FROM trash_bags WHERE event_data_key = $1';
+    const insertQuery =
+      'INSERT INTO trash_bags (event_data_key, pounds) VALUES ($1, $2) RETURNING *';
     const results = [];
 
+    // Delete previous trash bags with the same event_data_key
+    await pool.query(deleteQuery, [eventDataId]);
+
+    // Insert new trash bags
     await Promise.all(
       trashBags.map(async (bag) => {
-        const result = await pool.query(query, [eventDataKey, bag]);
+        const result = await pool.query(insertQuery, [eventDataId, bag]);
         results.push(result.rows[0]);
       }),
     );

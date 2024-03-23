@@ -79,15 +79,8 @@ dataRouter.post('/guestCheckin', async (req, res) => {
 dataRouter.put('/:id', async (req, res) => {
   // Update event data by ID
   try {
-    const {
-      volunteer_id,
-      number_in_party,
-      pounds,
-      ounces,
-      unusual_items,
-      event_id,
-      is_checked_in,
-    } = req.body;
+    const { volunteer_id, number_in_party, pounds, ounces, notes, event_id, is_checked_in } =
+      req.body;
     // Data to update passed through body
     const { id } = req.params;
     // ID passed as parameter
@@ -97,13 +90,13 @@ dataRouter.put('/:id', async (req, res) => {
       res.status(400).send('Invalid ID');
     } else {
       const putQuery =
-        'UPDATE event_data_new SET volunteer_id = $1, number_in_party = $2, pounds = $3, ounces = $4, unusual_items = $5, event_id = $6, is_checked_in = $7 WHERE id = $8';
+        'UPDATE event_data_new SET volunteer_id = $1, number_in_party = $2, pounds = $3, ounces = $4, notes = $5, event_id = $6, is_checked_in = $7 WHERE id = $8';
       const parameterValues = [
         volunteer_id,
         number_in_party,
         pounds,
         ounces,
-        unusual_items,
+        notes,
         event_id,
         is_checked_in,
         id,
