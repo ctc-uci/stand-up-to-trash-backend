@@ -29,6 +29,21 @@ trashBagsRouter.get('/:eventDataKey', async (req, res) => {
   }
 });
 
+trashBagsRouter.get('/event/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const query = 'SELECT * FROM event_data_new WHERE event_id = $1';
+    const result = await pool.query(query, [eventId]);
+    const eventDataKeys = result.rows.map((row) => row.id);
+    const trashBagsQuery = 'SELECT * FROM trash_bags WHERE event_data_key = ANY($1)';
+    const trashBagsResult = await pool.query(trashBagsQuery, [eventDataKeys]);
+    res.json(trashBagsResult.rows);
+  } catch (error) {
+    console.error('Error retrieving data from trash_bags table:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 trashBagsRouter.put('/:eventDataId', async (req, res) => {
   try {
     const { eventDataId } = req.params;
