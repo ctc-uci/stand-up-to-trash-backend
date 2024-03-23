@@ -57,9 +57,10 @@ statsRouter.get('/leaderboard/:eventId', async (req, res) => {
 statsRouter.get('/event/:eventId', async (req, res) => {
   try {
     const { eventId } = req.params;
-    const response = await pool.query('SELECT SUM(pounds) FROM event_data WHERE event_id = $1', [
-      eventId,
-    ]);
+    const response = await pool.query(
+      'SELECT SUM(pounds) FROM event_data_new WHERE event_id = $1',
+      [eventId],
+    );
     const totalTrash =
       response.rows[0].sum != null ? parseFloat(response.rows[0].sum).toFixed(1) : '0.00';
     res.json(totalTrash);
