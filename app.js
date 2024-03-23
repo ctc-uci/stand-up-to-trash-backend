@@ -10,6 +10,7 @@ const profilesRouter = require('./routes/profiles');
 const s3UploadRouter = require('./routes/s3upload');
 const statsRouter = require('./routes/stats');
 const firebaseRouter = require('./routes/firebase');
+const trashBagsRouter = require('./routes/trashbags');
 
 require('dotenv').config();
 
@@ -43,6 +44,7 @@ app.use('/profiles', profilesRouter);
 app.use('/s3upload', s3UploadRouter);
 app.use('/stats', statsRouter);
 app.use('/firebase', firebaseRouter);
+app.use('/trashbags', trashBagsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
