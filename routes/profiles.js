@@ -72,10 +72,11 @@ profilesRouter.get('/:id', async (req, res) => {
 profilesRouter.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { first_name, last_name, role, email, imageUrl } = req.body;
+    const { first_name, last_name, role, email, imageUrl, phone_number, organization, about_me } =
+      req.body;
     const updateProfile = await pool.query(
-      'UPDATE users SET first_name = $1, last_name = $2, role = $3, email = $4, image_url = $5 WHERE id = $6 RETURNING *',
-      [first_name, last_name, role, email, imageUrl, id],
+      'UPDATE users SET first_name = $1, last_name = $2, role = $3, email = $4, image_url = $5, phone_number = $6, organization = $7, about_me = $8 WHERE id = $9 RETURNING *',
+      [first_name, last_name, role, email, imageUrl, phone_number, organization, about_me, id],
     );
     res.status(200).json(updateProfile.rows[0]);
   } catch (error) {
