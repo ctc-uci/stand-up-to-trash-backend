@@ -308,7 +308,8 @@ dataRouter.get('/allVolunteers/counts', async (req, res) => {
         GROUP BY U.id
         ) as U, users as Us, event_data_new as E
       WHERE U.id = Us.id AND U.id = E.volunteer_id
-      `);
+      `,
+    );
     res.status(200).json(profileEventCount.rows);
   } catch (err) {
     res.status(500).send(err.message);
